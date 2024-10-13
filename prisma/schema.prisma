@@ -1,0 +1,156 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
+// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+enum Role{
+    User
+    Team_member
+    Agent
+    Admin
+}
+model Users{
+    id String @id @default(uuid())
+    firstname String
+    lastname String
+    email String @unique
+    password String
+    photo String?
+    photoId String?
+    provider String?
+    provider_id String?
+    resetlink String?
+    resetlink_expiresAt DateTime?
+    role Role @default(User)
+    isActive Boolean @default(true)
+    createdAt DateTime @default(now())
+    passwordChangedAt DateTime?
+    location location[]
+    property property[]
+    chat_request_sent chat_request[] @relation("request_sender")
+    chat_request_recieved chat_request[] @relation("request_reciever")
+    chat_room_own_created chat_room[] @relation("participant_first")
+    chat_room_others chat_room[] @relation("participant_second")
+    sent_chats chats[] @relation("sender")
+    recieved_chats chats[] @relation("reciever")
+}
+model location {
+  id       Int     @id @default(autoincrement())
+  city     String
+  country  String
+  lag      Float
+  lat      Float
+  User     Users?  @relation(fields: [user_id], references: [id])
+  user_id  String?
+  addressline String
+  isDefault Boolean @default(false)
+  property  property? @relation(fields: [property_id], references: [id],onDelete: Cascade)
+  property_id Int? @unique
+}
+enum PropertyType {
+  RESIDENTIAL
+  COMMERCIAL
+  INDUSTRIAL
+  AGRICULTURAL
+  RECREATIONAL
+  MIXED_USE
+}
+enum PropertyListingType {
+    FOR_SALE
+    FOR_RENT
+    AUCTION
+    FORECLOSURE
+    NEW_CONSTRUCTION
+    OPEN_HOUSE
+}
+model property {
+  id       Int     @id @default(autoincrement())
+  user     Users   @relation(fields: [user_id], references: [id],onDelete: Cascade)
+  user_id  String
+  title    String
+  summary  String
+  property_type PropertyType @default(RECREATIONAL)
+  description String
+  parking_lots Int
+  Listring_type PropertyListingType @default(FOR_SALE)
+  rentType String?
+  location location?
+  photos photos[]
+  amenities Int[]
+  price    Int
+  currency String
+  coverphoto String
+  coverphotoId String
+  area Int
+  bedrooms Int
+  bathrooms Int
+  isSaled Boolean @default(false)
+  listedon DateTime @default(now())
+  chat_request chat_request[]
+}
+model photos{
+  id Int @id @default(autoincrement())
+  photo String
+  photoId String
+  property_id Int
+  property property @relation(fields: [property_id],references: [id],onDelete: Cascade)
+}
+
+model amenities{
+  id Int @id @default(autoincrement())
+  title String
+}
+enum status{
+  PENDING
+  ACCEPTED
+  REJECTED
+}
+model chat_request{
+  id String @id @default(cuid())
+  from Users @relation("request_sender",fields: [from_id],references: [id])
+  to Users  @relation("request_reciever",fields: [to_id],references: [id])
+  from_id String
+  to_id String
+  property_id  Int 
+  property property @relation(fields: [property_id],references: [id])
+  status status @default(PENDING)
+  created_at  DateTime @default(now())
+  @@unique([property_id,from_id])
+}
+model chat_room{
+  id String @id @default(cuid())
+  participant_first  Users @relation("participant_first",fields: [participant_first_id],references: [id])
+  participant_first_id String
+  participant_second  Users @relation("participant_second",fields: [participant_second_id],references:[id])
+  participant_second_id String
+  created_At DateTime @default(now())
+  unique_user_string String @unique
+  chats chats[]
+}
+enum chat_status{
+  Sent
+  received
+  seen
+}
+model chats{
+  id Int @id @default(autoincrement())
+  chat_room chat_room @relation(fields: [chat_room_id],references: [id],onDelete: Cascade)
+  chat_room_id  String
+  sender Users @relation("sender",fields: [sender_id],references: [id])
+  sender_id String
+  reciever Users @relation("reciever",fields: [reciever_id],references: [id])
+  reciever_id String
+  message String
+  created_at DateTime @default(now())
+  status chat_status @default(Sent)
+}

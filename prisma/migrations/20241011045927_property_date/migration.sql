@@ -1,0 +1,2 @@
+-- AlterTable
+ALTER TABLE "property" ADD COLUMN     "listedon" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP;
