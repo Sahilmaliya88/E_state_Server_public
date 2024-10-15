@@ -43,6 +43,9 @@ model Users{
     chat_room_others chat_room[] @relation("participant_second")
     sent_chats chats[] @relation("sender")
     recieved_chats chats[] @relation("reciever")
+    article article[]
+
+    article_likes article_likes[]
 }
 model location {
   id       Int     @id @default(autoincrement())
@@ -153,4 +156,27 @@ model chats{
   message String
   created_at DateTime @default(now())
   status chat_status @default(Sent)
+}
+
+model article{
+  id Int @id @default( autoincrement())
+  author_Id String
+  author Users @relation(fields: [author_Id],references: [id])
+  title String
+  coverphoto String?
+  coverphoto_Id String?
+  description String
+  conclusion String?
+  created_At DateTime @default(now())
+  like_count Int @default(0)
+  article_likes article_likes[]
+}
+model article_likes{
+  id BigInt @id @default(autoincrement())
+  user_id String
+  user Users @relation(fields: [user_id],references: [id])
+  article article @relation(fields: [article_id],references: [id],onDelete: Cascade)
+  article_id Int
+  created_at DateTime @default(now())
+  @@unique([user_id,article_id])
 }

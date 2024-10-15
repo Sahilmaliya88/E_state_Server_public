@@ -9,7 +9,7 @@ export const globalErrorhandler=(err:AppError,req:Request,res:Response,next:Next
         return res.status(err.status).json({
             status:status,
             message:err.message,
-            err:err.stack,
+            err:err,
         })
     }else{
       return  res.status(err.status).json({
