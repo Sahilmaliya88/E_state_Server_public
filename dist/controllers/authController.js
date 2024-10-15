@@ -193,3 +193,63 @@ export const updateMe = checkAsync(async (req, res, next) => {
     });
     res.status(200).json({ status: 'success', user: user });
 });
+export const add_team_member = checkAsync(async (req, res, next) => {
+    const user_role = req.user.role;
+    if (!(user_role === "admin")) {
+        return next(new AppError("you have not permission to add team_member", 404));
+    }
+    await prisma.users.update({
+        where: {
+            id: req.params.id
+        },
+        data: {
+            role: "Team_member"
+        }
+    });
+    return res.status(200).json({ message: "success" });
+});
+export const remove_team_member = checkAsync(async (req, res, next) => {
+    const user_role = req.user.role;
+    if (!(user_role === "admin")) {
+        return next(new AppError("you have not permission to add team_member", 404));
+    }
+    await prisma.users.update({
+        where: {
+            id: req.params.id
+        },
+        data: {
+            role: "User"
+        }
+    });
+    return res.status(200).json({ message: "success" });
+});
+export const add_agent = checkAsync(async (req, res, next) => {
+    const user_role = req.user.role;
+    if (!(user_role === "admin" || user_role === "Team_member")) {
+        return next(new AppError("you have not permission to add team_member", 404));
+    }
+    await prisma.users.update({
+        where: {
+            id: req.params.id
+        },
+        data: {
+            role: "Agent"
+        }
+    });
+    return res.status(200).json({ message: "success" });
+});
+export const remove_agent = checkAsync(async (req, res, next) => {
+    const user_role = req.user.role;
+    if (!(user_role === "admin" || user_role === "Team_member")) {
+        return next(new AppError("you have not permission to remove agent", 404));
+    }
+    await prisma.users.update({
+        where: {
+            id: req.params.id
+        },
+        data: {
+            role: "User"
+        }
+    });
+    return res.status(200).json({ message: "success" });
+});

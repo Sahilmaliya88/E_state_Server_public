@@ -1,5 +1,5 @@
 import express from 'express';
-import { changePassword, createUser, deleteMe, ForgotPassword, Login, logout, verifyMiddle, verifyUser } from '../controllers/authController.js';
+import { changePassword, createUser, deleteMe, add_agent, remove_agent, add_team_member, remove_team_member, ForgotPassword, Login, logout, verifyMiddle, verifyUser } from '../controllers/authController.js';
 export const authRouter = express.Router();
 authRouter.route('/').post(createUser);
 authRouter.route('/verify').get(verifyMiddle, verifyUser);
@@ -7,4 +7,9 @@ authRouter.route('/login').post(Login);
 authRouter.route('/forgotpassword').patch(ForgotPassword);
 authRouter.route('/deleteMe/:id').delete(deleteMe);
 authRouter.route('/logout/:id').get(logout);
+authRouter.use(verifyMiddle);
+authRouter.route('/addteammember/:id').get(add_team_member);
+authRouter.route('/removeteammember/:id').get(remove_team_member);
+authRouter.route('/addagent/:id').get(add_agent);
+authRouter.route('/removeagent/:id').get(remove_agent);
 authRouter.route('/changepassword/:token').patch(changePassword);

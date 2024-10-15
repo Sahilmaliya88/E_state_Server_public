@@ -28,6 +28,8 @@ app.use(passport.session());
 app.use(morgan('dev'));
 // your routes here
 app.use('/', rootRouter);
-app.use(globalErrorhandler);
+app.use((err, req, res, next) => {
+    globalErrorhandler(err, req, res, next);
+});
 server.listen(port, () => console.log('Server is working on Port:' + port + ' in ' + envMode + ' Mode.'));
 export default server;

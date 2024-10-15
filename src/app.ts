@@ -1,4 +1,4 @@
-import express from 'express'
+import express,{Request,Response,NextFunction} from 'express'
 import {createServer} from 'http';
 import cors from 'cors'
 import morgan from 'morgan'
@@ -29,6 +29,8 @@ app.use(morgan('dev'))
 // your routes here
 app.use('/',rootRouter)
 
-app.use(globalErrorhandler);
+app.use((err:any,req:Request,res:Response,next:NextFunction)=>{
+    globalErrorhandler(err,req,res,next)
+});
 server.listen(port, () => console.log('Server is working on Port:'+port+' in '+envMode+' Mode.'));
 export default server
