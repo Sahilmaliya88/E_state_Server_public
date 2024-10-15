@@ -10,7 +10,7 @@ export  const create_Request = checkAsync(async(req:Request,res:Response,next:Ne
     })
     return res.status(201).json(request)
 })
-interface Configured_Request extends Request{
+export interface Configured_Request extends Request{
     user:any
 }
 export const acceptRequest = checkAsync(async(req:Configured_Request,res:Response,next:NextFunction)=>{
@@ -76,5 +76,166 @@ export const acceptRequest = checkAsync(async(req:Configured_Request,res:Respons
     res.status(200).json({
         message:"request accepted",
         chatRoomId:chatroom.id
+    })
+})
+
+export const getSentRequest = checkAsync(async(req:Configured_Request,res:Response,next:NextFunction)=>{
+
+    const requests = await prisma.chat_request.findMany({
+        where:{
+            from_id:req.user.id
+        },
+        include:{
+            property:{
+                select:{
+                    id:true,
+                    title:true,
+                    coverphoto:true,
+                }
+            }
+        }
+    })
+
+    return res.status(200).json({
+        requests:requests
+    })
+})
+export const recieved_request= checkAsync(async(req:Configured_Request,res:Response,next:NextFunction)=>{
+        const type = req.query.type 
+        let requests;
+        if(type==="pending"){
+            requests = await prisma.chat_request.findMany({
+                where:{
+                    AND:[
+                        {
+                            property_id:Number.parseInt(req.params.propid)
+                        },{
+                            to_id:req.user.id
+                        },{
+                            status:{
+                                equals: "PENDING"
+                            }
+                        }
+                    ]
+                },
+                include:{
+                    property:{
+                        select:{
+                            id:true,
+                            title:true,
+                            coverphoto:true,
+                        }
+                    }
+                },
+                orderBy:{
+                    created_at:"desc"
+                }
+            })  
+        }else if(type==="accepted"){
+            requests = await prisma.chat_request.findMany({
+                where:{
+                    AND:[
+                        {
+                            property_id:Number.parseInt(req.params.propid)
+                        },{
+                            to_id:req.user.id
+                        },{
+                            status:{
+                                equals: "ACCEPTED"
+                            }
+                        }
+                    ]
+                },
+                include:{
+                    property:{
+                        select:{
+                            id:true,
+                            title:true,
+                            coverphoto:true,
+                        }
+                    }
+                },
+                orderBy:{
+                    created_at:"desc"
+                }
+            })
+        
+        }else if(type==="rejected"){
+            requests = await prisma.chat_request.findMany({
+                where:{
+                    AND:[
+                        {
+                            property_id:Number.parseInt(req.params.propid)
+                        },{
+                            to_id:req.user.id
+                        },{
+                            status:{
+                                equals: "REJECTED"
+                            }
+                        }
+                    ]
+                },
+                include:{
+                    property:{
+                        select:{
+                            id:true,
+                            title:true,
+                            coverphoto:true,
+                        }
+                    }
+                },
+                orderBy:{
+                    created_at:"desc"
+                }
+            })
+        
+        }else{
+            requests = await prisma.chat_request.findMany({
+                where:{
+                    AND:[
+                        {
+                            property_id:Number.parseInt(req.params.propid)
+                        },{
+                            to_id:req.user.id
+                        }
+                    ]
+                },
+                include:{
+                    property:{
+                        select:{
+                            id:true,
+                            title:true,
+                            coverphoto:true,
+                        }
+                    }
+                },
+                orderBy:{
+                    created_at:"desc"
+                }
+            })
+        
+        }
+   
+    return res.status(200).json({
+        requests:requests
+    })
+})
+export const reject_request=checkAsync(async(req:Configured_Request,res:Response,next:NextFunction)=>{
+    const req_id = req.params.id
+    const user_id = req.user.id
+    const request = await prisma.chat_request.updateMany({where:{
+        AND:[
+            {
+                id:req_id
+            },{
+                to_id:user_id
+            }
+        ]
+    },data:{
+        status:"REJECTED"
+    }})
+    res.status(200).json({
+        status:"success",
+        message:"request rejected"
     })
 })
