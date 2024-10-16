@@ -46,6 +46,8 @@ model Users{
     article article[]
 
     article_likes article_likes[]
+
+    reviews reviews[]
 }
 model location {
   id       Int     @id @default(autoincrement())
@@ -179,4 +181,12 @@ model article_likes{
   article_id Int
   created_at DateTime @default(now())
   @@unique([user_id,article_id])
+}
+model reviews{
+  id Int @id @default(autoincrement())
+  user_id String
+  user Users @relation(fields: [user_id],references: [id],onDelete: Cascade)
+  title String
+  description String
+  create_at DateTime @default(now())
 }

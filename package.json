@@ -16,7 +16,6 @@
      "type": "module",
      "license": "ISC",
      "dependencies": {
-          "@prisma/client": "^5.20.0",
           "bcrypt": "^5.1.1",
           "cloudinary": "^2.5.1",
           "concurrently": "^9.0.1",
@@ -33,12 +32,12 @@
           "passport-facebook": "^3.0.0",
           "passport-google-oauth20": "^2.0.0",
           "pg": "^8.13.0",
-          "prisma": "^5.20.0",
           "redis": "^4.7.0",
           "socket.io": "^4.8.0"
      },
      "devDependencies": {
           "@eslint/js": "^9.12.0",
+          "@prisma/client": "^5.21.0",
           "@types/bcrypt": "^5.0.2",
           "@types/cookie-parser": "^1.4.7",
           "@types/cors": "2.8.17",
@@ -58,6 +57,7 @@
           "eslint": "^9.12.0",
           "globals": "^15.10.0",
           "nodemon": "3.1.7",
+          "prisma": "^5.21.0",
           "typescript": "5.6.2",
           "typescript-eslint": "^8.8.1"
      }
